@@ -1,37 +1,107 @@
-import { useState } from 'react'
-import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiClock } from 'react-icons/fi'
+import { useState } from 'react';
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiClock } from 'react-icons/fi';
+// Importamos las funciones de autenticación necesarias de Firebase
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase/firebase-config.ts'; // Asegúrate de que este archivo configure correctamente Firebase
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
-function SignUp() {
-  const [isLogin, setIsLogin] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  })
 
+
+function Login() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState<string | null>(null);
+  //const [error, setError] = useState(null); // Para manejar errores
+  const [loading, setLoading] = useState(false); // Para manejar el estado de carga
+  const navigate = useNavigate(); // Hook para navegación
+  // Manejar cambios en los campos del formulario
   const handleInputChange = (e:any) => {
-    const { name, value } = e.target
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }))
-  }
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
-  const handleSubmit = (e:any) => {
-    e.preventDefault()
-    // Aquí iría la lógica para enviar los datos al servidor
-    console.log('Datos del formulario:', formData)
-  }
+  // Función para manejar el envío del formulario
+  const handleSubmit = async (e:any) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
+    try {
+      if (isLogin) {
+        // Lógica para iniciar sesión
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password,
+        );
+        console.log('Inicio de sesión exitoso');
+        const user = userCredential.user;
+
+        const { data } = await axios.get(
+          `http://localhost:3001/usersdata/${user.uid}`
+        );
+
+        navigate("/dashboard", {
+          state: {
+            name: data.name || "User", // Usa `displayName` si está configurado, o un valor por defecto.
+            email: user.email,
+            uid: user.uid,
+          },
+        })
+        //console.log(data)
+        
+      } else {
+        // Lógica para registrar un nuevo usuario
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+        console.log('Registro exitoso');
+        const user = userCredential.user; // Usuario autenticado por Firebase.
+  
+        // Enviar datos adicionales al backend para guardarlos en PostgreSQL.
+        await axios.post("http://localhost:3001/register", {
+          name: formData.name,
+          email: user.email,
+          firebaseUid: user.uid,
+        });
+  
+        console.log('Usuario guardado en la base de datos.');
+  
+        // Navegar al dashboard después del registro.
+        navigate("/dashboard", {
+          state: {
+            name: formData.name, // Nombre proporcionado al registrarse.
+            email: user.email,
+            uid: user.uid,
+          },
+        });
+      }
+    } catch (err:any) {
+      if (err.code === "auth/email-already-in-use") {
+        setError("El correo electrónico ya está registrado. Por favor, prueba con otro.");
+      } else {
+        setError("Ocurrió un error al registrarte. Por favor, inténtalo de nuevo.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Alternar entre formulario de login y registro
   const toggleForm = () => {
-    setIsLogin(!isLogin)
-    setFormData({ name: '', email: '', password: '' })
-  }
+    setIsLogin(!isLogin);
+    setFormData({ name: '', email: '', password: '' });
+    setError(null);
+  };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
+  // Alternar la visibilidad de la contraseña
+  const togglePasswordVisibility = () => {+
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -44,13 +114,10 @@ function SignUp() {
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             {!isLogin && (
               <div>
-                <label htmlFor="name" className="sr-only">
-                  Nombre
-                </label>
+                <label htmlFor="name" className="sr-only">Nombre</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiUser className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -59,7 +126,6 @@ function SignUp() {
                     id="name"
                     name="name"
                     type="text"
-                    autoComplete="name"
                     required={!isLogin}
                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm pl-10"
                     placeholder="Nombre completo"
@@ -70,9 +136,7 @@ function SignUp() {
               </div>
             )}
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Correo electrónico
-              </label>
+              <label htmlFor="email-address" className="sr-only">Correo electrónico</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiMail className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -81,7 +145,6 @@ function SignUp() {
                   id="email-address"
                   name="email"
                   type="email"
-                  autoComplete="email"
                   required
                   className={`appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 ${
                     isLogin ? 'rounded-t-md' : ''
@@ -93,9 +156,7 @@ function SignUp() {
               </div>
             </div>
             <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Contraseña
-              </label>
+              <label htmlFor="password" className="sr-only">Contraseña</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiLock className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -103,8 +164,7 @@ function SignUp() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm pl-10 pr-12"
                   placeholder="Contraseña"
@@ -117,49 +177,23 @@ function SignUp() {
                     onClick={togglePasswordVisibility}
                     className="text-gray-400 hover:text-gray-300 focus:outline-none z-10"
                   >
-                    {showPassword ? (
-                      <FiEyeOff className="h-5 w-5" aria-hidden="true" />
-                    ) : (
-                      <FiEye className="h-5 w-5" aria-hidden="true" />
-                    )}
+                    {showPassword ? <FiEyeOff className="h-5 w-5" aria-hidden="true" /> : <FiEye className="h-5 w-5" aria-hidden="true" />}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-700 rounded bg-gray-800"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
-                Recordarme
-              </label>
-            </div>
-
-            {isLogin && (
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300 underline">
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
-            )}
-          </div>
-
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>} {/* Mostrar errores */}
           <div>
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-indigo-600 text-sm font-medium rounded-md text-indigo-300 hover:text-white hover:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300"
+              disabled={loading} // Desactivar botón mientras está cargando
             >
-              {isLogin ? 'Iniciar sesión' : 'Registrarse'}
+              {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Registrarse'}
             </button>
           </div>
         </form>
-
         <div className="text-center">
           <p className="text-sm text-gray-400">
             {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
@@ -173,8 +207,7 @@ function SignUp() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default SignUp
-
+export default Login;

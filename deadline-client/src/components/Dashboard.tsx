@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { Menu } from '@headlessui/react'
 import { FiClock } from 'react-icons/fi'
+import { useLocation } from 'react-router-dom';
+
 import { 
   ClockIcon, 
   UserGroupIcon, 
@@ -54,10 +56,13 @@ const activities: Activity[] = [
 ]
 
 export default function Dashboard() {
+  const location = useLocation();
+  const { name, email, uid } = location.state || {};  // `location.state` es el objeto que pasaste desde Login
   const [currentUser] = useState({
-    name: 'John Doe',
+    name: name,
     avatar: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/d1ebddf2-2c00-40a9-ba8a-309c6963d526-XGTmTI7hS1LFYfsIv66LXo2BnqYtin.png'
   })
+  console.log({name, email, uid})
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
