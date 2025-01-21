@@ -1,24 +1,56 @@
 import React from 'react'
-
-
 // Importamos los iconos que vamos a utilizar
 import { 
   FiLayout, 
   FiCheckSquare, 
   FiBarChart, 
   FiUsers, 
-  FiMenu,
-  FiClock
+  FiMenu
 } from 'react-icons/fi'
-
+/*
 import { NavLink } from 'react-router-dom';
+import { auth } from '../firebase/firebase-config'; 
+import { onAuthStateChanged } from "firebase/auth";
+*/
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../hooks/AuthContext";
 
 function Home() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
+/*
+    // Verificar el estado de autenticación
+    React.useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+      });
+      return () => unsubscribe(); // Limpiar el efecto
+    }, []);
+ 
+    const goToDashboard = () => {
+      // Asegúrate de que tienes la información del usuario
+      if (user) {
+        navigate('/dashboard', { state: { name: user.name, email: user.email, uid: user.uid } });
+      } else {
+        navigate('/login'); // Redirigir a login si no hay usuario
+      }
+    };
+*/
+const handleLogout = async () => {
+  try {
+    await logout();
+    navigate("/");
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
+};
+    
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -26,11 +58,14 @@ function Home() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
-            <div className="flex justify-start lg:w-0 lg:flex-1">
-            <FiClock className="h-7 w-10 text-indigo-600" aria-hidden="true" />
-              <a href="#" className="text-xl font-bold text-gray-800">
+            <div className="items-center flex justify-start lg:w-0 lg:flex-1 ">
+              {/*          <FiClock className="h-7 w-10 text-indigo-600" aria-hidden="true" />*/}
+            <h1 className="text-4xl tracking-tight font-extrabold text-indigo-600 sm:text-4xl md:text-5xl mr-2">
+                D
+              </h1>
+              <h1 className="text-xl font-bold text-gray-800 mt-1">
                 Deadline
-              </a>
+              </h1>
             </div>
             <div className="-mr-2 -my-2 md:hidden">
               <button
@@ -60,7 +95,7 @@ function Home() {
               </a>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-              <NavLink to='/login' >
+              {/*              <NavLink to='/login' >
                 <a href="#" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
                   Iniciar Sesión
                 </a>
@@ -71,7 +106,37 @@ function Home() {
                   className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                   Registrarse
                 </a>
-              </NavLink> 
+              </NavLink>  */}
+              {user ? (
+  <>
+          <button
+            onClick={()=> navigate("/dashboard")}
+            className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900 cursor-pointer"
+          >
+            Ir al Dashboard
+          </button>
+          <button
+            onClick={handleLogout}
+            className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-600 hover:bg-red-700"
+          >
+            Cerrar Sesión
+          </button>
+  </>
+) : (
+  <>
+
+      <button onClick={()=> navigate("/login")} className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+        Iniciar Sesión
+      </button>
+
+
+      <button onClick={()=> navigate("/login")} className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+        Registrarse
+      </button>
+
+  </>
+)}
+
             </div>
           </div>
         </div>

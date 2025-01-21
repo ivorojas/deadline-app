@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { auth } from '../firebase/firebase-config.ts'; // Asegúrate de que este archivo configure correctamente Firebase
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { updateProfile } from "firebase/auth";
 
 
 
@@ -61,7 +62,7 @@ function Login() {
         );
         console.log('Registro exitoso');
         const user = userCredential.user; // Usuario autenticado por Firebase.
-  
+        await updateProfile(user, { displayName: formData.name });
         // Enviar datos adicionales al backend para guardarlos en PostgreSQL.
         await axios.post("http://localhost:3001/register", {
           name: formData.name,
@@ -84,7 +85,7 @@ function Login() {
       if (err.code === "auth/email-already-in-use") {
         setError("El correo electrónico ya está registrado. Por favor, prueba con otro.");
       } else {
-        setError("Ocurrió un error al registrarte. Por favor, inténtalo de nuevo.");
+        setError("No se encontró una cuenta con ese Correo o Contraseña. Registrese si no tiene una");
       }
     } finally {
       setLoading(false);
@@ -106,10 +107,16 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="flex flex-col items-center">
-          <FiClock className="h-12 w-12 text-indigo-500" aria-hidden="true" />
-          <h1 className="mt-2 text-center text-3xl font-extrabold text-white">Deadline</h1>
-          <h2 className="mt-6 text-center text-2xl font-bold text-white">
+        <div className="flex flex-col items-center ">
+          {/*<FiClock className="h-12 w-12 text-indigo-500" aria-hidden="true" /> */}
+          <a href="/" className="text-4xl tracking-tight font-extrabold text-indigo-600 sm:text-4xl md:text-5xl mr-2">
+                D
+              </a>
+              <a href="/" className="mt-2 text-center text-3xl font-extrabold text-white">
+              Deadline
+              </a>
+          {/*<h1 className="mt- text-center text-3xl font-extrabold text-white">Deadline</h1> */}
+          <h2 className="mt-10 text-center text-2xl font-bold text-white">
             {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
           </h2>
         </div>

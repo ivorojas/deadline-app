@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { Menu } from '@headlessui/react'
+/*
 import { FiClock } from 'react-icons/fi'
 import { useLocation } from 'react-router-dom';
+import { useAuth } from "../hooks/AuthContext";
+import { useNavigate } from "react-router-dom";
+*/
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/firebase-config"; // Configuración de Firebase
 
 import { 
   ClockIcon, 
@@ -12,6 +18,13 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon
 } from '@heroicons/react/24/outline'
+
+// Define el tipo del usuario
+interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+}
 
 // Types
 interface Task {
@@ -56,13 +69,46 @@ const activities: Activity[] = [
 ]
 
 export default function Dashboard() {
+  const [user, setUser] = useState<User | null>(null); // Define el tipo del estado
+  const [loading, setLoading] = useState(true);
+  /*
   const location = useLocation();
-  const { name, email, uid } = location.state || {};  // `location.state` es el objeto que pasaste desde Login
+  const { user } = useAuth();
+  const { name, email, uid } = location.state || {name: "User", email:"Not logged email", uid:"not logged uid"};  // `location.state` es el objeto que pasaste desde Login
   const [currentUser] = useState({
     name: name,
     avatar: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/d1ebddf2-2c00-40a9-ba8a-309c6963d526-XGTmTI7hS1LFYfsIv66LXo2BnqYtin.png'
   })
-  console.log({name, email, uid})
+    */
+  console.log({ user})
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // Usuario autenticado
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName
+        });
+      } else {
+        // Usuario no autenticado
+        setUser(null);
+      }
+      setLoading(false); // Deja de mostrar el estado de carga
+    });
+
+    // Cleanup del listener
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (!user) {
+    return <p>No estás autenticado. Por favor, inicia sesión.</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -71,8 +117,11 @@ export default function Dashboard() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <FiClock className="h-7 w-10 text-indigo-800" aria-hidden="true" />
-              <span className="text-xl font-semibold">Deadline</span>
+              {/*<FiClock className="h-7 w-10 text-indigo-800" aria-hidden="true" /> */}
+              <h1  className="text-4xl tracking-tight font-extrabold text-indigo-600 sm:text-3xl md:text-4xl mr-2.5">
+                D
+              </h1>
+              <span className="text-xl font-semibold  mt-1">Deadline</span>
               {/* Mobile menu button */}
               <button className="ml-4 md:hidden rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,8 +140,12 @@ export default function Dashboard() {
             {/* User Menu */}
             <Menu as="div" className="relative">
               <Menu.Button className="flex items-center space-x-3 rounded-full bg-gray-800 p-2 hover:bg-gray-700">
-                <img src={currentUser.avatar || "/placeholder.svg"} alt="" className="h-8 w-8 rounded-full" />
-                <span className="hidden sm:block">{currentUser.name}</span>
+                
+                {/* */}
+                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-indigo-600 text-white font-bold">
+                {user.displayName ? user.displayName[0].toUpperCase() : "User"}
+    </div>
+                <span className="hidden sm:block">{user.displayName}</span>
               </Menu.Button>
               <Menu.Items className="absolute right-0 mt-2 w-48 rounded-md bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                 <Menu.Item>
@@ -106,6 +159,13 @@ export default function Dashboard() {
                   {({ active }) => (
                     <a href="#" className={`${active ? 'bg-gray-700' : ''} block px-4 py-2 text-sm text-gray-300`}>
                       Configuración
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a href="/" className={`${active ? 'bg-gray-700' : ''} block px-4 py-2 text-sm text-gray-300`}>
+                      Ir a inicio
                     </a>
                   )}
                 </Menu.Item>
