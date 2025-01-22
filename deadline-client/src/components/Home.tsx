@@ -216,7 +216,7 @@ const handleLogout = async () => {
                     <span className="block text-indigo-600 xl:inline">Simplificada</span>
                   </h1>
                   <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                    Optimiza tus proyectos, tareas y finanzas en una sola plataforma. Diseñado para hacer crecer tu negocio.
+                    Optimiza tus proyectos y tareas en una sola plataforma. Diseñado para hacer crecer tu negocio.
                   </p>
                   <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                     <div className="rounded-md shadow">
@@ -293,10 +293,10 @@ const handleLogout = async () => {
                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
                       <FiBarChart className="h-6 w-6" aria-hidden="true" />
                     </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Informes Detallados</p>
+                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Informes Detallados y Chat</p>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Obtén insights valiosos con nuestros informes personalizados.
+                    Obtén insights valiosos y chatea con tus compañeros.
                   </dd>
                 </div>
 
@@ -320,16 +320,16 @@ const handleLogout = async () => {
         <div className="bg-indigo-700">
           <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-              <span className="block">¿Listo para comenzar tu viaje hacia una mejor gestión empresarial?</span>
+              <span className="block">Comienza tu viaje 100% gratis para siempre</span>
             </h2>
             <p className="mt-4 text-lg leading-6 text-indigo-200">
-              Únete a miles de empresas que ya están optimizando sus operaciones con nuestra plataforma.
+              Únete a las personas que ya están optimizando sus operaciones en nuestra plataforma.
             </p>
             <a
               href="#"
               className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 sm:w-auto"
             >
-              Prueba Gratis por 14 Días
+              Comenzar
             </a>
           </div>
         </div>

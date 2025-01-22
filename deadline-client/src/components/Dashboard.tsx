@@ -1,12 +1,8 @@
+
 import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { Menu } from '@headlessui/react'
-/*
-import { FiClock } from 'react-icons/fi'
-import { useLocation } from 'react-router-dom';
-import { useAuth } from "../hooks/AuthContext";
-import { useNavigate } from "react-router-dom";
-*/
+
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/firebase-config"; // Configuración de Firebase
 
@@ -71,15 +67,6 @@ const activities: Activity[] = [
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null); // Define el tipo del estado
   const [loading, setLoading] = useState(true);
-  /*
-  const location = useLocation();
-  const { user } = useAuth();
-  const { name, email, uid } = location.state || {name: "User", email:"Not logged email", uid:"not logged uid"};  // `location.state` es el objeto que pasaste desde Login
-  const [currentUser] = useState({
-    name: name,
-    avatar: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/d1ebddf2-2c00-40a9-ba8a-309c6963d526-XGTmTI7hS1LFYfsIv66LXo2BnqYtin.png'
-  })
-    */
   console.log({ user})
 
   useEffect(() => {
@@ -89,7 +76,7 @@ export default function Dashboard() {
         setUser({
           uid: currentUser.uid,
           email: currentUser.email,
-          displayName: currentUser.displayName
+          displayName: currentUser.displayName,
         });
       } else {
         // Usuario no autenticado
