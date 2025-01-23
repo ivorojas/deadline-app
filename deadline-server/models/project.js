@@ -1,29 +1,28 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Project extends Model {
     static associate(models) {
-      this.belongsToMany(models.Project, {
+      this.belongsToMany(models.User, {
         through: 'ProjectMembers',
-        foreignKey: 'userId',
-        as: 'projects',
+        foreignKey: 'projectId',
+        as: 'members',
       });
       this.hasMany(models.Task, {
-        foreignKey: 'userId',
+        foreignKey: 'projectId',
         as: 'tasks',
       });
     }
   }
-  User.init(
+  Project.init(
     {
-      firebaseUid: DataTypes.STRING,
       name: DataTypes.STRING,
-      email: DataTypes.STRING,
+      description: DataTypes.STRING,
     },
     {
       sequelize,
-      modelName: 'User',
+      modelName: 'Project',
     }
   );
-  return User;
+  return Project;
 };
