@@ -40,4 +40,24 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+// Reinicio automático de la base de datos en desarrollo
+if (env === 'development' && process.env.DB_RESET === 'true') {
+  sequelize.sync({ force: true }) // Cambia a alter: true si no quieres borrar datos
+    .then(() => {
+      console.log('Base de datos reiniciada con éxito');
+    })
+    .catch((err) => {
+      console.error('Error al reiniciar la base de datos:', err);
+    });
+} else {
+  sequelize.sync()
+    .then(() => {
+      console.log('Base de datos sincronizada');
+    })
+    .catch((err) => {
+      console.error('Error al sincronizar la base de datos:', err);
+    });
+}
+
+
 module.exports = db;

@@ -8,6 +8,7 @@ interface TaskListProps {
   onNewTask: () => void
   showAllTasks: boolean
   setShowAllTasks: (show: boolean) => void
+  onEditTask: (updatedTask: Task) => void
 }
 
 export function TaskList({
@@ -17,6 +18,7 @@ export function TaskList({
   onNewTask,
   showAllTasks,
   setShowAllTasks,
+  onEditTask,
 }: TaskListProps) {
   const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null)
 
@@ -25,7 +27,7 @@ export function TaskList({
   }
 
   return (
-    <div className="rounded-lg bg-gray-800/50 p-6">
+    <div className={`rounded-lg bg-gray-800/50 p-6 ${showAllTasks ? "col-span-full" : ""}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Lista de Tareas</h2>
         <button onClick={onNewTask} className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
@@ -45,6 +47,7 @@ export function TaskList({
             onToggle={() => toggleTaskExpansion(task.id)}
             onStatusChange={(newStatus) => onStatusChange(task.id, newStatus)}
             onDelete={() => onDeleteTask(task.id)}
+            onEdit={(updatedTask) => onEditTask(updatedTask)}
           />
         ))}
       </div>

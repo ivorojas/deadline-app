@@ -16,14 +16,14 @@ const {
 
 
 router.post('/register', register)
-router.post('/projects', projectRoutes);
-router.post('/tasks', taskRoutes);
-router.post('/members', memberRoutes);
+//router.post('/projects', projectRoutes);
+//router.post('/tasks', taskRoutes);
+//router.post('/members', memberRoutes);
 //los get--------------
 router.get('/usersdata/:firebaseUid', usersdata);
-router.get('/projects', getProjects);
-router.get('/projects/:projectId/tasks', getTasksByProject);
-router.get('/projects/:projectId/members', getMembersByProject);
+//router.get('/projects', getProjects);
+//router.get('/projects/:projectId/tasks', getTasksByProject);
+//router.get('/projects/:projectId/members', getMembersByProject);
 
 
 

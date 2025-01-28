@@ -20,7 +20,7 @@ interface ChatProps {
 }
 
 export function Chat({
-  activities,
+  activities = [],
   chatMessage,
   setChatMessage,
   handleSendMessage,
@@ -36,7 +36,7 @@ export function Chat({
   }, [activities])
 
   return (
-    <div className={`rounded-lg bg-gray-800/50 p-6 ${expandChat ? "col-span-2 row-span-2" : ""}`}>
+    <div className={`rounded-lg bg-gray-800/50 p-6 ${expandChat ? "col-span-full" : ""}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Actividades Recientes y Chat</h2>
         <button

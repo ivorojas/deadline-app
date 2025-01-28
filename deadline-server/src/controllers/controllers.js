@@ -1,7 +1,12 @@
 require('dotenv').config();
 
-const { Project, ProjectMember, User, Task } = require('../models');
-
+const { Project, ProjectMember, User, Task } = require('../../models');
+/*
+const { Project } = require('../../models/project');
+const { ProjectMember } = require('../../models/projectmember');
+const { Task } = require('../../models/task');
+const { User } = require('../../models/user');
+*/
 const register = async (req, res) => {
 
     const { name, email, firebaseUid } = req.body;
